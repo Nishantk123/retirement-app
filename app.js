@@ -4,6 +4,8 @@ const cors = require("cors");
 const http = require("http");
 const path = require('path');
 const userRouter = require("./routes/user-routes");
+const employeeRouter = require("./routes/employee-routes");
+const messageRouter = require("./routes/message-routes");
 require("dotenv").config();
 require("./config/database").connect();
 
@@ -20,6 +22,8 @@ app.use(cors(corsOpts));
 app.use(express.static('public'));
 
 app.use("/user", userRouter) 
+app.use("/employee", employeeRouter)
+app.use("/message", messageRouter)
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "client", "build")));

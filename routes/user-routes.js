@@ -8,7 +8,7 @@ const User = require("../model/user");
 const router = express.Router();
 const DIR = "";
 
-router.post("/register", upload.single("logo"), async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     //get user input
     const {
@@ -33,7 +33,8 @@ router.post("/register", upload.single("logo"), async (req, res) => {
       return res.status(409).send("User Already Exist. Please Login");
     }
     //Encrypt user password
-    encryptedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    encryptedPassword = await bcrypt.hash(password, salt);
     const user = await User.create({
       name,
       email: email.toLowerCase(), // sanitize: convert email to lowercase
@@ -97,6 +98,21 @@ router.get("/users", async (req, res) => {
     .skip(Number(per_page) * (Number(page) - 1))
     .sort("desc");
   res.status(200).json(userData);
+});
+
+router.patch("/user/:id", async (req, res) => {
+  try {
+    let updateObject = req.body; // {last_name : "smith", age: 44}
+    let id = req.params.id;
+    const filter = { _id: Object(id) };
+    const update = updateObject;
+    let userData = await User.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    res.status(200).json(userData);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 module.exports = router;
